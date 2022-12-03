@@ -2,10 +2,10 @@ const persistance = require('./persistance')
 const { Guild } = require('./Guild')
 
 const defaultServer = {
-    "preJoinTimer": 300,
+    "preJoinTimer": 900,
     "warChannel": "war-channel",
     "callRate": [15, 10, 5],
-    "firstCallTimer": 600,
+    "firstCallTimer": 80,
     "warCount": 0,
     "timeZone": 0
 }
