@@ -1,15 +1,13 @@
 const persistance = require('./persistance')
 const { Guild } = require('./Guild')
 
-var timee = new Date();
-
 const defaultServer = {
     "preJoinTimer": 900,
     "warChannel": "war-channel",
     "callRate": [15, 10, 5],
     "firstCallTimer": 80,
     "warCount": 0,
-    "timeZone": timee
+    "timeZone": 0
 }
 
 function createDefault(id) {
