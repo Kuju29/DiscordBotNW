@@ -5,7 +5,7 @@ const defaultServer = {
     "preJoinTimer": 900,
     "warChannel": "war-channel",
     "callRate": [15, 10, 5],
-    "firstCallTimer": 80,
+    "firstCallTimer": 120,
     "warCount": 0,
     "timeZone": 0
 }
