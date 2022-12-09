@@ -30,7 +30,7 @@ docker compose up -d
 ```
 connect to the running postgresql and run:
 ```
-CREATE USER nwbot WITH PASSWORD '[YOUR PASSWORD DEFINED IN DATABASE_URL]' CREATEDB;
+docker exec -it postgres psql -U postgres -c "CREATE USER nwbot WITH PASSWORD '[YOUR PASSWORD DEFINED IN DATABASE_URL]' CREATEDB;
 ```
 
 To install all npm packages, run:
