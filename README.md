@@ -50,3 +50,8 @@ To start the server, run
 ```
 node ./src/main.js
 ```
+
+## Remove all docker file
+```
+docker compose down --rmi all -v --remove-orphans
+```
