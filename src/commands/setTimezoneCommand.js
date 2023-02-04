@@ -8,7 +8,7 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName("time")
 				.setDescription("Your local time in the following format: HH:MM")
-				.setRequired(true)
+				.setRequired(false)
 		),
 	async execute(interaction) {
 		guildService.getOrCreate(interaction.guild.id, interaction).then(guild => {
