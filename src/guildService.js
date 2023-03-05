@@ -4,7 +4,7 @@ const { Guild } = require("./Guild");
 const defaultServer = {
   preJoinTimer: 900,
   warChannel: "war-channel",
-  callRate: [15, 10, 5],
+  callRate: [50, 40, 35, 30, 25, 20, 15, 10, 5, 4, 3, 2, 1],
   firstCallTimer: 60,
   warCount: 0,
   timeZone: 0,
