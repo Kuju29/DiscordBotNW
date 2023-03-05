@@ -4,6 +4,21 @@ const sounds = require("./sounds");
 const { getRandomJoinFile, getRandomLeaveFile } = require("./utils");
 const respawns = require(path.join("..", "config", "respawns.json"));
 
+const player = createAudioPlayer();
+
+player.on('stateChange', (oldState, newState) => {
+  const oldNetworking = Reflect.get(oldState, 'networking');
+  const newNetworking = Reflect.get(newState, 'networking');
+
+  const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
+    const newUdp = Reflect.get(newNetworkState, 'udp');
+    clearInterval(newUdp?.keepAliveInterval);
+  }
+
+  oldNetworking?.off('stateChange', networkStateChangeHandler);
+  newNetworking?.on('stateChange', networkStateChangeHandler);
+});
+
 class War {
   constructor(guild, msg, warStart, startCallback, leaveCallback) {
     this.guild = guild;
@@ -13,7 +28,7 @@ class War {
     this.timeoutId = null;
     this.leaveCallback = leaveCallback;
     this.startCallback = startCallback;
-    this.player = createAudioPlayer();
+    this.player = player;
     this.scheduleWar();
   }
 
@@ -39,17 +54,19 @@ class War {
     this.clearTimeouts();
     this.playFile(getRandomLeaveFile());
     var con = getVoiceConnection(this.guild.id);
-    this.player.once(AudioPlayerStatus.Idle, (oldState, newState) => {
-      const oldNetworking = Reflect.get(oldState, 'networking');
-      const newNetworking = Reflect.get(newState, 'networking');
-  
-      const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
-        const newUdp = Reflect.get(newNetworkState, 'udp');
-        clearInterval(newUdp?.keepAliveInterval);
-      }
-  
-      oldNetworking?.off('stateChange', networkStateChangeHandler);
-      newNetworking?.on('stateChange', networkStateChangeHandler);
+    this.player.once(AudioPlayerStatus.Idle, () => {
+      con.on('stateChange', (oldState, newState) => {
+        const oldNetworking = Reflect.get(oldState, 'networking');
+        const newNetworking = Reflect.get(newState, 'networking');
+      
+        const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
+          const newUdp = Reflect.get(newNetworkState, 'udp');
+          clearInterval(newUdp?.keepAliveInterval);
+        }
+      
+        oldNetworking?.off('stateChange', networkStateChangeHandler);
+        newNetworking?.on('stateChange', networkStateChangeHandler);
+      });
       this.player.stop();
       con.destroy();
       this.leaveCallback();
@@ -103,6 +120,18 @@ class War {
         adapterCreator: this.msg.guild.voiceAdapterCreator,
         selfMute: false,
         selfDeaf: false,
+      });
+      con.on('stateChange', (oldState, newState) => {
+        const oldNetworking = Reflect.get(oldState, 'networking');
+        const newNetworking = Reflect.get(newState, 'networking');
+      
+        const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
+          const newUdp = Reflect.get(newNetworkState, 'udp');
+          clearInterval(newUdp?.keepAliveInterval);
+        }
+      
+        oldNetworking?.off('stateChange', networkStateChangeHandler);
+        newNetworking?.on('stateChange', networkStateChangeHandler);
       });
       con.subscribe(this.player);
       this.playFile(getRandomJoinFile());
@@ -162,18 +191,7 @@ class War {
       () => {
         this.playFile(file);
         if (last) {
-          this.player.once(AudioPlayerStatus.Idle, (oldState, newState) => {
-            const oldNetworking = Reflect.get(oldState, 'networking');
-            const newNetworking = Reflect.get(newState, 'networking');
-        
-            const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
-              const newUdp = Reflect.get(newNetworkState, 'udp');
-              clearInterval(newUdp?.keepAliveInterval);
-            }
-        
-            oldNetworking?.off('stateChange', networkStateChangeHandler);
-            newNetworking?.on('stateChange', networkStateChangeHandler);
-            
+          this.player.once(AudioPlayerStatus.Idle, () => {
             this.playFile(sounds.counterSounds.noRespawn);
           });
         }
