@@ -6,17 +6,14 @@ const respawns = require(path.join("..", "config", "respawns.json"));
 
 const player = createAudioPlayer();
 
+const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
+  const newUdp = Reflect.get(newNetworkState, 'udp');
+  clearInterval(newUdp?.keepAliveInterval);
+}
+
 player.on('stateChange', (oldState, newState) => {
-  const oldNetworking = Reflect.get(oldState, 'networking');
-  const newNetworking = Reflect.get(newState, 'networking');
-
-  const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
-    const newUdp = Reflect.get(newNetworkState, 'udp');
-    clearInterval(newUdp?.keepAliveInterval);
-  }
-
-  oldNetworking?.off('stateChange', networkStateChangeHandler);
-  newNetworking?.on('stateChange', networkStateChangeHandler);
+  Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
+  Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
 });
 
 class War {
@@ -56,16 +53,8 @@ class War {
     var con = getVoiceConnection(this.guild.id);
     this.player.once(AudioPlayerStatus.Idle, () => {
       con.on('stateChange', (oldState, newState) => {
-        const oldNetworking = Reflect.get(oldState, 'networking');
-        const newNetworking = Reflect.get(newState, 'networking');
-      
-        const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
-          const newUdp = Reflect.get(newNetworkState, 'udp');
-          clearInterval(newUdp?.keepAliveInterval);
-        }
-      
-        oldNetworking?.off('stateChange', networkStateChangeHandler);
-        newNetworking?.on('stateChange', networkStateChangeHandler);
+        Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
+        Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
       });
       this.player.stop();
       con.destroy();
@@ -122,16 +111,8 @@ class War {
         selfDeaf: false,
       });
       con.on('stateChange', (oldState, newState) => {
-        const oldNetworking = Reflect.get(oldState, 'networking');
-        const newNetworking = Reflect.get(newState, 'networking');
-      
-        const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
-          const newUdp = Reflect.get(newNetworkState, 'udp');
-          clearInterval(newUdp?.keepAliveInterval);
-        }
-      
-        oldNetworking?.off('stateChange', networkStateChangeHandler);
-        newNetworking?.on('stateChange', networkStateChangeHandler);
+        Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
+        Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
       });
       con.subscribe(this.player);
       this.playFile(getRandomJoinFile());
